@@ -19,9 +19,12 @@ st.set_page_config(page_title="Telco Customer Churn - EDA Dashboard", layout="wi
 # ----------------------------------------------------------------------
 # Data loading & cleaning (cached so it only runs once)
 # ----------------------------------------------------------------------
+import os
+
 @st.cache_data
 def load_data():
-    df = pd.read_csv("Telco-Customer-Churn.csv")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_csv(os.path.join(base_dir, "Telco-Customer-Churn.csv"))
 
     # TotalCharges has blank strings for tenure == 0 customers -> coerce & fill
     df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
