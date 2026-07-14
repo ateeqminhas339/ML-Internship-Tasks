@@ -1,0 +1,27 @@
+__pycache__/
+   *.py[cod]
+   *$py.class
+
+   .ipynb_checkpoints/
+
+   venv/
+   .venv/
+   env/
+   ENV/
+
+   build/
+   dist/
+   *.egg-info/
+
+   .DS_Store
+   Thumbs.db
+
+   .vscode/
+   .idea/
+
+   .env
+   *.pem
+   *.key
+
+   data/processed/*.csv
+   !data/processed/.gitkeep
