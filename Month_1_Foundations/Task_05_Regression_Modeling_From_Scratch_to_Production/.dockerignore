@@ -1,0 +1,14 @@
+.git
+.gitignore
+.ipynb_checkpoints
+__pycache__
+*.pyc
+notebook.ipynb
+data/
+figures/
+reports/
+src/
+README.md
+requirements.txt
+venv/
+.venv/
