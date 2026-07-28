@@ -67,9 +67,11 @@ curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" \
 
 ```bash
 docker build -t insurance-charges-api .
-docker run -p 8000:8000 insurance-charges-api
+docker run -p 8000:8000 -p 8501:8501 insurance-charges-api
 ```
-Then the same `curl` command above works against the containerized API.
+This starts both:
+- the FastAPI JSON API at `http://localhost:8000` (same `curl` command above works, plus interactive docs at `/docs`)
+- a Streamlit browser UI at `http://localhost:8501` for predicting charges through a form
 
 ## Key results
 
