@@ -10,10 +10,15 @@ WORKDIR /app
 COPY api/requirements.txt ./api/requirements.txt
 RUN pip install --no-cache-dir -r api/requirements.txt
 
-# Copy the serving app and the pre-trained model artifact.
+# Copy the serving apps and the pre-trained model artifact.
 COPY api/app.py ./api/app.py
+COPY api/streamlit_app.py ./api/streamlit_app.py
 COPY api/model.joblib ./api/model.joblib
+COPY api/start.sh ./api/start.sh
+RUN chmod +x ./api/start.sh
 
-EXPOSE 8000
+# 8000 = FastAPI JSON API (/predict, /health, /docs)
+# 8501 = Streamlit browser UI
+EXPOSE 8000 8501
 
-CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./api/start.sh"]
