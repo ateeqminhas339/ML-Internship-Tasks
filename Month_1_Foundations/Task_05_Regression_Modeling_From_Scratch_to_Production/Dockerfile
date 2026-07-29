@@ -14,11 +14,12 @@ RUN pip install --no-cache-dir -r api/requirements.txt
 COPY api/app.py ./api/app.py
 COPY api/streamlit_app.py ./api/streamlit_app.py
 COPY api/model.joblib ./api/model.joblib
-COPY api/start.sh ./api/start.sh
-RUN chmod +x ./api/start.sh
 
 # 8000 = FastAPI JSON API (/predict, /health, /docs)
 # 8501 = Streamlit browser UI
 EXPOSE 8000 8501
 
-CMD ["./api/start.sh"]
+# Run both servers. Defined inline (instead of a separate start.sh) to avoid
+# Windows CRLF line-ending issues when the file is edited via GitHub's web
+# editor or Notepad, which breaks shell script execution inside Linux.
+CMD ["sh", "-c", "uvicorn api.app:app --host 0.0.0.0 --port 8000 & streamlit run api/streamlit_app.py --server.address 0.0.0.0 --server.port 8501"]
