@@ -1,0 +1,4 @@
+Download "winequality-red.csv" from the UCI Machine Learning Repository
+(Wine Quality dataset) and place it in this folder before running app.py.
+
+Expected path: dataset/winequality-red.csv
