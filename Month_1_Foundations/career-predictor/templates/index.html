@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Path & Skill-Gap Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <h1>Compass</h1>
+    <p class="tagline">A career-path model for AI &amp; ML students</p>
+  </div>
+</header>
+
+<main class="layout">
+
+  <section class="intro">
+    <p>
+      Compass reads a student's academic scores, self-rated skills, and stated
+      interest, then predicts the career track where that profile fits best —
+      Data Science, AI/ML Engineering, Web Development, Cyber Security, or
+      Cloud/DevOps. It also names the specific skills to raise for that track.
+    </p>
+  </section>
+
+  <section class="panel form-panel">
+    <form action="/predict" method="post">
+
+      <fieldset>
+        <legend>Academic record</legend>
+        <div class="field-row">
+          <label for="cgpa">CGPA (1.5 – 4.0)</label>
+          <input type="number" step="0.01" min="1.5" max="4.0" id="cgpa" name="cgpa"
+                 value="{{ form_data.cgpa if form_data else 3.2 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="math_score">Mathematics score (0 – 100)</label>
+          <input type="number" min="0" max="100" id="math_score" name="math_score"
+                 value="{{ form_data.math_score if form_data else 70 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="programming_score">Programming score (0 – 100)</label>
+          <input type="number" min="0" max="100" id="programming_score" name="programming_score"
+                 value="{{ form_data.programming_score if form_data else 70 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="communication_score">Communication score (0 – 100)</label>
+          <input type="number" min="0" max="100" id="communication_score" name="communication_score"
+                 value="{{ form_data.communication_score if form_data else 70 }}" required>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Self-rated skills (0 – 10)</legend>
+        <div class="field-row">
+          <label for="ml_skill">Machine learning</label>
+          <input type="number" min="0" max="10" id="ml_skill" name="ml_skill"
+                 value="{{ form_data.ml_skill if form_data else 5 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="web_skill">Web development</label>
+          <input type="number" min="0" max="10" id="web_skill" name="web_skill"
+                 value="{{ form_data.web_skill if form_data else 5 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="security_skill">Cyber security</label>
+          <input type="number" min="0" max="10" id="security_skill" name="security_skill"
+                 value="{{ form_data.security_skill if form_data else 5 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="cloud_skill">Cloud platforms</label>
+          <input type="number" min="0" max="10" id="cloud_skill" name="cloud_skill"
+                 value="{{ form_data.cloud_skill if form_data else 5 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="stats_skill">Statistics</label>
+          <input type="number" min="0" max="10" id="stats_skill" name="stats_skill"
+                 value="{{ form_data.stats_skill if form_data else 5 }}" required>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Experience &amp; interest</legend>
+        <div class="field-row">
+          <label for="internship_count">Completed internships</label>
+          <input type="number" min="0" max="10" id="internship_count" name="internship_count"
+                 value="{{ form_data.internship_count if form_data else 1 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="project_count">Completed projects</label>
+          <input type="number" min="0" max="20" id="project_count" name="project_count"
+                 value="{{ form_data.project_count if form_data else 2 }}" required>
+        </div>
+        <div class="field-row">
+          <label for="interest_area">Strongest interest area</label>
+          <select id="interest_area" name="interest_area" required>
+            <option value="data" {{ 'selected' if form_data and form_data.interest_area == 'data' }}>Data</option>
+            <option value="ai" {{ 'selected' if form_data and form_data.interest_area == 'ai' }}>Artificial intelligence</option>
+            <option value="web" {{ 'selected' if form_data and form_data.interest_area == 'web' }}>Web</option>
+            <option value="security" {{ 'selected' if form_data and form_data.interest_area == 'security' }}>Security</option>
+            <option value="cloud" {{ 'selected' if form_data and form_data.interest_area == 'cloud' }}>Cloud</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <button type="submit" class="submit-btn">Predict my career path</button>
+    </form>
+  </section>
+
+  {% if result %}
+  <section class="panel result-panel">
+    <h2>Recommended track</h2>
+    <p class="result-headline">{{ result.predicted_path }}</p>
+    <p class="result-confidence">{{ result.confidence }}% match confidence</p>
+
+    <h3>Full ranking</h3>
+    <ul class="ranking-list">
+      {% for item in result.ranked_results %}
+      <li>
+        <span class="rank-label">{{ item.path }}</span>
+        <span class="rank-bar-track">
+          <span class="rank-bar-fill" style="width: {{ item.confidence }}%;"></span>
+        </span>
+        <span class="rank-value">{{ item.confidence }}%</span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <h3>Skill gaps for this track</h3>
+    {% if result.skill_gaps %}
+    <ul class="gap-list">
+      {% for gap in result.skill_gaps %}
+      <li>
+        <span class="gap-skill">{{ gap.skill }}</span>
+        <span class="gap-detail">currently {{ gap.current }}, target {{ gap.target }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="no-gaps">This profile already meets the target level on every skill checked for this track.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+</main>
+
+<footer class="site-footer">
+  <p>Model: Random Forest classifier trained on a labeled student-profile dataset.</p>
+</footer>
+
+</body>
+</html>
